@@ -117,7 +117,7 @@ loadResources(function (err, devices) {
       if (error) return res.status(400).send('A problem setting one value occurred')
       else {
         var client = mqtt.connect()
-        client.publish('bridge', JSON.stringify(response))
+        client.publish('netbeast/bridge', JSON.stringify(response))
         res.send(response)
       }
     } else res.status(404).send('Device not found')
@@ -144,7 +144,7 @@ loadResources(function (err, devices) {
         }
       })
       var client = mqtt.connect()
-      client.publish('lights', JSON.stringify(response))
+      client.publish('netbeast/lights', JSON.stringify(response))
       res.send(response)
     } else res.status(404).send('Device not found')
   })
@@ -169,7 +169,7 @@ loadResources(function (err, devices) {
       if (error) return res.status(404).send('A problem setting one value occurred')
       else {
         var client = mqtt.connect()
-        client.publish('switch', JSON.stringify(response))
+        client.publish('netbeast/switch', JSON.stringify(response))
         return res.send(response)
       }
     } else res.status(404).send('Device not found')
