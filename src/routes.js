@@ -10,8 +10,10 @@ var switchvalues = {power: 'binaryState'}
 var bulbvalues = {power: '10006', brightness: '10008'}
 var bridgevalues = {power: 'binaryState'}
 
+var mqttClient = mqtt.connect('ws://' + process.env.NETBEAST)
+
 loadResources(function (err, devices) {
-  if (err) throw err
+  if (err) console.log(new Error(err))
   // ### GET ###
   router.get('/wemoBridge/:id', function (req, res, next) {
     var device = devices.filter(function (elem) {
@@ -116,8 +118,7 @@ loadResources(function (err, devices) {
       })
       if (error) return res.status(400).send('A problem setting one value occurred')
       else {
-        var client = mqtt.connect()
-        client.publish('netbeast/bridge', JSON.stringify(response))
+        mqttClient.publish('netbeast/bridge', JSON.stringify(response))
         res.send(response)
       }
     } else res.status(404).send('Device not found')
@@ -143,7 +144,6 @@ loadResources(function (err, devices) {
           client.setDeviceStatus(req.params.id, bulbvalues[key], req.body[key])
         }
       })
-      var client = mqtt.connect()
       client.publish('netbeast/lights', JSON.stringify(response))
       res.send(response)
     } else res.status(404).send('Device not found')
@@ -168,8 +168,7 @@ loadResources(function (err, devices) {
       })
       if (error) return res.status(404).send('A problem setting one value occurred')
       else {
-        var client = mqtt.connect()
-        client.publish('netbeast/switch', JSON.stringify(response))
+        mqttClient.publish('netbeast/switch', JSON.stringify(response))
         return res.send(response)
       }
     } else res.status(404).send('Device not found')

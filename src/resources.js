@@ -5,12 +5,11 @@ var devices = []
 
 module.exports = function (callback) {
   var objects = []
-  request.get(process.env.LOCAL_URL + '/resources?app=belkin-wemo',
+  request.get('http://' + process.env.NETBEAST + '/api/resources?app=belkin-wemo',
   function (err, resp, body) {
-    body = JSON.parse(body)
     if (err) callback(err, null)
-    else if (body.data && body.data.length > 0) {
-      body.data.forEach(function (device) {
+    else if (body && body.length > 0) {
+      body.forEach(function (device) {
         if (objects.indexOf(device.hook) < 0) objects.push(device.hook)
       })
     }
@@ -24,12 +23,10 @@ module.exports = function (callback) {
         objects.splice(indx, 1)
       } else {
         // Bridge solo GET
-        request.post({url: process.env.LOCAL_URL + '/resources',
+        request.post({url: 'http://' + process.env.NETBEAST + '/api/resources',
         json: {
           app: 'belkin-wemo',
-          location: 'none',
           topic: 'bridge',
-          groupname: 'none',
           hook: '/wemoBridge/' + deviceInfo.macAddress
         }},
         function (err, resp, body) {
@@ -46,12 +43,10 @@ module.exports = function (callback) {
           if (indx >= 0) {
             objects.splice(indx, 1)
           } else {
-            request.post({url: process.env.LOCAL_URL + '/resources',
+            request.post({url: 'http://' + process.env.NETBEAST + '/api/resources',
             json: {
               app: 'belkin-wemo',
-              location: 'none',
               topic: 'lights',
-              groupname: 'none',
               hook: '/wemoLights/' + lights.deviceId
             }},
             function (err, resp, body) {
@@ -66,12 +61,10 @@ module.exports = function (callback) {
       if (indx >= 0) {
         objects.splice(indx, 1)
       } else {
-        request.post({url: process.env.LOCAL_URL + '/resources',
+        request.post({url: 'http://' + process.env.NETBEAST + '/api/resources',
         json: {
           app: 'belkin-wemo',
-          location: 'none',
           topic: 'switch',
-          groupname: 'none',
           hook: '/wemoSwitch/' + deviceInfo.macAddress
         }},
         function (err, resp, body) {
@@ -83,7 +76,7 @@ module.exports = function (callback) {
   setTimeout(function () {
     if (objects.length > 0) {
       objects.forEach(function (hooks) {
-        request.del(process.env.LOCAL_URL + '/resources?hook=' + hooks,
+        request.del('http://' + process.env.NETBEAST + '/api/resources?hook=' + hooks,
         function (err, resp, body) {
           if (err) callback(err, null)
         })
