@@ -4,6 +4,7 @@ var loadResources = require('./resources')
 var Wemo = require('wemo-client')
 var wemo = new Wemo()
 var mqtt = require('mqtt')
+var netbeast = require('netbeast')
 
 //  Acepted Values for Each Device
 var switchvalues = {power: 'binaryState'}
@@ -13,7 +14,10 @@ var bridgevalues = {power: 'binaryState'}
 var mqttClient = mqtt.connect('ws://' + process.env.NETBEAST)
 
 loadResources(function (err, devices) {
-  if (err) console.log(new Error(err))
+  if (err) {
+    console.trace(new Error(err))
+    netbeast().error(err, 'Something wrong!')
+  }
   // ### GET ###
   router.get('/wemoBridge/:id', function (req, res, next) {
     var device = devices.filter(function (elem) {
@@ -161,7 +165,7 @@ loadResources(function (err, devices) {
       Object.keys(req.body).forEach(function (key) {
         if (switchvalues[key]) {
           response[key] = req.body[key]
-          client.setBinaryState(req.body[key], function (err, data) {
+          client.setBinaryState(req.body[key] ? 1 : 0, function (err, data) {
             if (err) error = true
           })
         }
