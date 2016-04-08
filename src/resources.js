@@ -1,3 +1,5 @@
+var util = require('util')
+
 var request = require('request')
 var Wemo = require('wemo-client')
 
@@ -8,7 +10,7 @@ module.exports = function (callback) {
   request.get('http://' + process.env.NETBEAST + '/api/resources?app=belkin-wemo',
   function (err, resp, body) {
     if (err) callback(err, null)
-    else if (body && body.length > 0) {
+    else if (util.isArray(body)) {
       body.forEach(function (device) {
         if (objects.indexOf(device.hook) < 0) objects.push(device.hook)
       })
