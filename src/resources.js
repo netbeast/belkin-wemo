@@ -87,5 +87,5 @@ module.exports = function (callback) {
     callback(null, devices)
     wemo = null
     devices = []
-  }, 7000)
+  }, 20000)
 }

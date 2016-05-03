@@ -22,7 +22,7 @@
     "netbeast": "^1.0.5",
     "request": "^2.62.0",
     "socket.io": "^1.3.7",
-    "wemo-client": "^0.3.0"
+    "wemo-client": "^0.7.0"
   },
   "devDependencies": {},
   "scripts": {

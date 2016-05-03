@@ -130,12 +130,12 @@ loadResources(function (err, devices) {
 
   router.post('/wemoLights/:id', function (req, res, next) {
     var device = devices.filter(function (elem) {
-      if (elem.deviceId === req.params.id && elem.currentState &&
-        elem.capabilities) return true
+      if (elem.deviceId === req.params.id && elem.capabilities) return true
     })
     var bridge = devices.filter(function (elem) {
       if (elem.deviceType === Wemo.DEVICE_TYPE.Bridge) return true
     })
+
     if (device.length > 0 && bridge.length > 0) {
       var client = wemo.client(bridge[0])
       var response = {}
@@ -143,12 +143,21 @@ loadResources(function (err, devices) {
         // Comprobar si este valor se le puede asignar a esta bombilla
         if (bulbvalues[key]) {
           response[key] = req.body[key]
-          if (req.body[key] === true) req.body[key] = 1
-          else if (req.body[key] === false) req.body[key] = 0
-          client.setDeviceStatus(req.params.id, bulbvalues[key], req.body[key])
+          switch (key) {
+            case 'power':
+              client.getDeviceStatus(req.params.id, function (err, status) {
+
+                if (req.body[key] === 'on') req.body[key] = 1
+                else if (req.body[key] === 'off') req.body[key] = 0
+                if (status['10006'] != req.body[key]) client.setDeviceStatus(req.params.id, bulbvalues[key], req.body[key])
+              })
+              break
+            case 'brightness':
+              client.setDeviceStatus(req.params.id, bulbvalues[key], req.body[key] * 2.55)
+          }
         }
       })
-      client.publish('netbeast/lights', JSON.stringify(response))
+      if (response) mqttClient.publish('netbeast/lights', JSON.stringify(response))
       res.send(response)
     } else res.status(404).send('Device not found')
   })
